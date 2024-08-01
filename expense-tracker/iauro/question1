@@ -1,0 +1,69 @@
+import java.util.Arrays;
+
+public class ShippingOptimization {
+
+    public static int minContainersNeeded(int[] shipments, int[] containerLimits) {
+        // Calculate total units needed
+        int totalUnits = Arrays.stream(shipments).sum();
+
+        // Sort container limits in descending order
+        Arrays.sort(containerLimits);
+        reverse(containerLimits);
+
+        // Initialize variables
+        int containerIndex = 0;
+        int containerCount = 0;
+        int currentCapacity = 0;
+        
+        // Process each shipment
+        for (int shipment : shipments) {
+            while (shipment > 0) {
+                if (containerIndex >= containerLimits.length) {
+                    // No more containers available
+                    return -1;
+                }
+
+                if (currentCapacity == 0) {
+                    // Move to the next container
+                    currentCapacity = containerLimits[containerIndex];
+                    containerCount++;
+                }
+
+                // Use the current container to ship as much as possible
+                if (shipment <= currentCapacity) {
+                    currentCapacity -= shipment;
+                    shipment = 0;
+                } else {
+                    // Container will be full after this shipment
+                    shipment -= currentCapacity;
+                    currentCapacity = 0;
+                    
+                    // Move to the next container
+                    containerIndex++;
+                }
+            }
+        }
+
+        return containerCount;
+    }
+
+    // Helper method to reverse an array
+    private static void reverse(int[] array) {
+        int left = 0;
+        int right = array.length - 1;
+        while (left < right) {
+            int temp = array[left];
+            array[left] = array[right];
+            array[right] = temp;
+            left++;
+            right--;
+        }
+    }
+
+    // Main method for testing
+    public static void main(String[] args) {
+        int[] shipments = {10, 20, 30};
+        int[] containerLimits = {15, 15, 20, 10};
+        System.out.println("Minimum number of containers needed: " + minContainersNeeded(shipments, containerLimits));  // Output: 4
+    }
+}
